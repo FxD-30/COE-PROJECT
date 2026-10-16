@@ -1,24 +1,10 @@
 {
-  // A fallback TypeScript config for local editor tooling before Nuxt generates
-  // .nuxt/tsconfig.json during project setup.
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "jsx": "preserve",
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "noEmit": true,
-    "skipLibCheck": true
-  },
-  "include": [
-    ".nuxt/nuxt.d.ts",
-    "**/*",
-    "**/*.vue"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
+  // https://nuxt.com/docs/guide/concepts/typescript
+  "files": [],
+  "references": [
+    { "path": "./.nuxt/tsconfig.app.json" },
+    { "path": "./.nuxt/tsconfig.server.json" },
+    { "path": "./.nuxt/tsconfig.shared.json" },
+    { "path": "./.nuxt/tsconfig.node.json" }
   ]
 }
