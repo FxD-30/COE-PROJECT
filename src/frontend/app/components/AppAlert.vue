@@ -10,5 +10,6 @@
   border: 1px solid #f0c36d;
   border-radius: 6px;
   background-color: #fff8e1;
+  text-align: center;
 }
 </style>
