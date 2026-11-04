@@ -5,9 +5,14 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     environment:
       - NODE_ENV=production
+      # Used by the browser, so it must be the backend's address as seen from the host.
+      - NUXT_PUBLIC_API_BASE=http://localhost:${BACKEND_PORT:-8000}/api
+    depends_on:
+      backend:
+        condition: service_healthy
     restart: unless-stopped
 
   backend:
@@ -16,12 +21,50 @@ services:
       dockerfile: Dockerfile
     container_name: backend
     ports:
-      - "8000:80"
-    env_file:
-      - ./src/backend/.env
+      - "${BACKEND_PORT:-8000}:80"
     environment:
+      - APP_NAME=Test Mart
       - APP_ENV=production
       - APP_DEBUG=false
-      - APP_URL=http://localhost:8000
+      # Optional: ./setup.sh writes one to .env; otherwise the container generates a temporary key.
+      - APP_KEY=${APP_KEY:-}
+      - APP_URL=http://localhost:${BACKEND_PORT:-8000}
       - LOG_CHANNEL=stderr
+      - SEED_DEMO_DATA=${SEED_DEMO_DATA:-true}
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=${POSTGRES_DB:-coe}
+      - DB_USERNAME=${POSTGRES_USER:-coe}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-secret}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://localhost/up') === false ? 1 : 0);"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
     restart: unless-stopped
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-coe}
+      - POSTGRES_USER=${POSTGRES_USER:-coe}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

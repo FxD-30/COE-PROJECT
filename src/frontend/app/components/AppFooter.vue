@@ -1,5 +1,5 @@
 <template>
-  <footer>
-    <p>&copy; {{ new Date().getFullYear() }} COE Project</p>
-  </footer>
+  <UFooter>
+    <p class="text-sm text-muted">&copy; {{ new Date().getFullYear() }} FxD - COE PROJECT</p>
+  </UFooter>
 </template>

@@ -10,6 +10,10 @@ RUN composer dump-autoload --optimize --no-dev
 FROM php:8.4-apache
 WORKDIR /var/www/html
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libpq-dev libicu-dev \
+    && docker-php-ext-install pdo_pgsql intl \
+    && rm -rf /var/lib/apt/lists/*
 RUN sed -ri 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf \
     && a2enconf servername \
